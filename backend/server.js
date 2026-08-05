@@ -1,6 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const { admin, db } = require("./firebase/firebaseAdmin.js");
+const port = process.env.PORT || 8080;
 
 // Import routes
 const authRoutes = require("./routes/authRoutes");
@@ -23,5 +24,5 @@ app.use("/upload", uploadRoutes);      // PDF upload
 app.use("/books", booksRoutes);        // books & words routes
 app.use("/knownWords", knownWordsRoutes); // known words routes
 
-app.listen(5000, () => console.log("Backend running on http://localhost:5000"));
+app.listen(port, () => console.log("Backend running on http://localhost:",port));
 console.log("Backend is running...");
