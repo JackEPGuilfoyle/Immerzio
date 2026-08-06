@@ -24,5 +24,5 @@ app.use("/upload", uploadRoutes);      // PDF upload
 app.use("/books", booksRoutes);        // books & words routes
 app.use("/knownWords", knownWordsRoutes); // known words routes
 
-app.listen(port, () => console.log("Backend running on http://localhost:",port));
+app.listen(port, () => console.log(`Backend running on port ${port}`));
 console.log("Backend is running...");
