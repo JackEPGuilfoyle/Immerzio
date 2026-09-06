@@ -29,7 +29,6 @@ function App() {
         ref={videoRef}
         autoPlay
         playsInline
-        style={{ width: '100%', maxWidth: '500px' }}
       />
     </div>
   )
