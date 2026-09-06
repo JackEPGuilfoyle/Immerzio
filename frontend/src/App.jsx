@@ -3,25 +3,25 @@ import { useRef } from 'react'
 function App() {
   const videoRef = useRef(null)
 
-const openCamera = async () => {
-  try {
-    const stream = await navigator.mediaDevices.getUserMedia({
-      video: {
-        facingMode: 'environment',
-      },
-    })
+  const openCamera = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: {
+          facingMode: 'environment',
+        },
+      })
 
-    videoRef.current.srcObject = stream
-  } catch (error) {
-    console.error('Could not access camera:', error)
+      videoRef.current.srcObject = stream
+    } catch (error) {
+      console.error('Could not access camera:', error)
+    }
   }
-}
 
   return (
-    <div>
+    <div className="app">
       <h1>Immerzio</h1>
 
-      <button onClick={openCamera}>
+      <button className="camera-button" onClick={openCamera}>
         Open Camera
       </button>
 
