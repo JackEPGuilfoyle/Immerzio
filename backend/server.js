@@ -1,5 +1,7 @@
 const express = require("express");
 const cors = require("cors");
+const multer = require("multer");
+const path = require("path");
 const { admin, db } = require("./firebase/firebaseAdmin.js");
 const port = process.env.PORT || 8080;
 
@@ -16,6 +18,20 @@ const port = process.env.PORT || 8080;
 const app = express();
 app.use(cors());
 app.use(express.json());
+
+const upload = multer({
+  dest: path.join(__dirname, "uploads"),
+});
+
+app.post("/api/scan", upload.single("image"), (req, res) => {
+  console.log("Received image!");
+  console.log("Saved to:", req.file.path);
+  console.log("Size:", req.file.size, "bytes");
+
+  res.json({
+    message: "Image received successfully",
+  });
+});
 
 // Use routes
 // app.use("/auth", authRoutes);          // register & login

@@ -1,7 +1,16 @@
-import { useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 function App() {
   const videoRef = useRef(null)
+  const streamRef = useRef(null)
+  const [cameraOpen, setCameraOpen] = useState(false)
+
+  useEffect(() => {
+    if (cameraOpen && videoRef.current && streamRef.current) {
+      videoRef.current.srcObject = streamRef.current
+      videoRef.current.play()
+    }
+  }, [cameraOpen])
 
   const openCamera = async () => {
     try {
@@ -11,7 +20,8 @@ function App() {
         },
       })
 
-      videoRef.current.srcObject = stream
+      streamRef.current = stream
+      setCameraOpen(true)
     } catch (error) {
       console.error('Could not access camera:', error)
     }
@@ -21,15 +31,20 @@ function App() {
     <div className="app">
       <h1>Immerzio</h1>
 
-      <button className="camera-button" onClick={openCamera}>
-        Open Camera
-      </button>
+      {!cameraOpen && (
+        <button className="camera-button" onClick={openCamera}>
+          Open Camera
+        </button>
+      )}
 
-      <video
-        ref={videoRef}
-        autoPlay
-        playsInline
-      />
+      {cameraOpen && (
+        <video
+          ref={videoRef}
+          autoPlay
+          playsInline
+          muted
+        />
+      )}
     </div>
   )
 }
