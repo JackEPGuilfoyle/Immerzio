@@ -4,25 +4,25 @@ const { admin, db } = require("./firebase/firebaseAdmin.js");
 const port = process.env.PORT || 8080;
 
 // Import routes
-const authRoutes = require("./routes/authRoutes");
-const profileRoutes = require("./routes/profileRoutes");
-const uploadRoutes = require("./routes/uploadRoutes");
-const booksRoutes = require("./routes/booksRoutes");
-const knownWordsRoutes = require("./routes/knownWordsRoutes");
+// const authRoutes = require("./routes/authRoutes");
+// const profileRoutes = require("./routes/profileRoutes");
+// const uploadRoutes = require("./routes/uploadRoutes");
+// const booksRoutes = require("./routes/booksRoutes");
+// const knownWordsRoutes = require("./routes/knownWordsRoutes");
 
 // Import middleware
-const verifyToken = require("./middleware/verifyToken");
+// const verifyToken = require("./middleware/verifyToken");
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
 // Use routes
-app.use("/auth", authRoutes);          // register & login
-app.use("/profile", profileRoutes);    // protected profile route
-app.use("/upload", uploadRoutes);      // PDF upload
-app.use("/books", booksRoutes);        // books & words routes
-app.use("/knownWords", knownWordsRoutes); // known words routes
+// app.use("/auth", authRoutes);          // register & login
+// app.use("/profile", profileRoutes);    // protected profile route
+// app.use("/upload", uploadRoutes);      // PDF upload
+// app.use("/books", booksRoutes);        // books & words routes
+// app.use("/knownWords", knownWordsRoutes); // known words routes
 
 app.listen(port, () => console.log(`Backend running on port ${port}`));
 console.log("Backend is running...");
