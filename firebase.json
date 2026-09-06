@@ -9,5 +9,20 @@
       "firebase-debug.*.log",
       "functions"
     ]
+  },
+  "hosting": {
+    "site": "immerzio-2",
+    "public": "frontend/dist",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "rewrites": [
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ]
   }
 }
