@@ -6,6 +6,23 @@ function App() {
   const canvasRef = useRef(null)
 
   const [cameraOpen, setCameraOpen] = useState(false)
+  const [message, setMessage] = useState('')
+
+  const testBackend = async () => {
+    try {
+      const response = await fetch(
+        'https://immerzio-backend--immerzio-2.europe-west4.hosted.app/api/test'
+      )
+
+      const data = await response.json()
+
+      setMessage(data.message)
+    } catch (error) {
+      console.error('Backend request failed:', error)
+      setMessage('Backend request failed')
+    }
+  }
+
 
   useEffect(() => {
     if (cameraOpen && videoRef.current && streamRef.current) {
@@ -48,7 +65,7 @@ function App() {
       formData.append('image', blob, 'page.jpg')
 
       try {
-        const response = await fetch('http://localhost:8080/api/scan', {
+        const response = await fetch('https://immerzio-backend--immerzio-2.europe-west4.hosted.app/api/scan', {
           method: 'POST',
           body: formData,
         })
@@ -65,6 +82,12 @@ function App() {
   return (
     <div className="app">
       <h1>Immerzio</h1>
+
+       <button className="camera-button" onClick={testBackend}>
+        Test Backend
+      </button>
+
+      <p>{message}</p>
 
       {!cameraOpen && (
         <button className="camera-button" onClick={openCamera}>
