@@ -1,6 +1,8 @@
 const express = require("express");
 const cors = require("cors");
 const multer = require("multer");
+const { filterText } = require("./utils/textFilter");
+const { createWorker } = require("tesseract.js");
 const { admin, db } = require("./firebase/firebaseAdmin.js");
 const port = process.env.PORT || 8080;
 
@@ -30,10 +32,8 @@ app.get("/api/test", (req, res) => {
   });
 });
 
-app.post("/api/scan", upload.single("image"), (req, res) => {
+app.post("/api/scan", upload.single("image"), async (req, res) => {
   console.log("SCAN REQUEST RECEIVED");
-
-  console.log("File:", req.file);
 
   if (!req.file) {
     console.log("No image received!");
@@ -47,12 +47,32 @@ app.post("/api/scan", upload.single("image"), (req, res) => {
   console.log("MIME type:", req.file.mimetype);
   console.log("Size:", req.file.size, "bytes");
 
-  res.json({
-    message: "Image received successfully!",
-    filename: req.file.originalname,
-    type: req.file.mimetype,
-    size: req.file.size
-  });
+  try {
+    console.log("Starting OCR...");
+
+    const worker = await createWorker("deu");
+
+    const result = await worker.recognize(req.file.buffer);
+
+    await worker.terminate();
+
+    console.log("OCR complete!");
+    console.log("Extracted text:");
+    console.log(result.data.text);
+
+    res.json({
+      message: "OCR successful!",
+      text: result.data.text
+    });
+
+  } catch (error) {
+        console.error("OCR failed:", error);
+
+        res.status(500).json({
+        message: "OCR failed",
+        error: error.message
+        });
+    }
 });
 // Use routes
 // app.use("/auth", authRoutes);          // register & login
