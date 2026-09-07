@@ -32,7 +32,7 @@ app.get("/api/test", (req, res) => {
   });
 });
 
-app.post("/api/scan", upload.single("image"), async (req, res) => {
+app.post("/api/scan", upload.single("image"), async (req, res) => {             // API SCAN // API SCAN // API SCAN // API SCAN //
   console.log("SCAN REQUEST RECEIVED");
 
   if (!req.file) {
@@ -55,6 +55,8 @@ app.post("/api/scan", upload.single("image"), async (req, res) => {
     const result = await worker.recognize(req.file.buffer);
 
     await worker.terminate();
+
+    const text = result.data.text;
 
     console.log("OCR complete!");
     console.log("Extracted text:");
