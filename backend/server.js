@@ -15,6 +15,7 @@ const port = process.env.PORT || 8080;
 
 // Import middleware
 // const verifyToken = require("./middleware/verifyToken");
+const scanRoutes = require("./routes/scanRoutes");
 
 const app = express();
 app.use(cors());
@@ -31,54 +32,8 @@ app.get("/api/test", (req, res) => {
     message: "Hello from the Immerzio backend!"
   });
 });
-
-app.post("/api/scan/:bookId", upload.single("image"), async (req, res) => {             // API SCAN // API SCAN // API SCAN // API SCAN //
-  const bookId = req.params.bookId;
-  console.log("SCAN REQUEST RECEIVED");
-
-  if (!req.file) {
-    console.log("No image received!");
-
-    return res.status(400).json({
-      message: "No image received"
-    });
-  }
-
-  console.log("Image received!");
-  console.log("MIME type:", req.file.mimetype);
-  console.log("Size:", req.file.size, "bytes");
-
-  try {
-    console.log("Starting OCR...");
-
-    const worker = await createWorker("deu");
-
-    const result = await worker.recognize(req.file.buffer);
-
-    await worker.terminate();
-
-    const text = result.data.text;
-
-    console.log("OCR complete!");
-    console.log("Extracted text:");
-    console.log(result.data.text);
-
-    res.json({
-      message: "OCR successful!",
-      text: result.data.text
-    });
-
-  } catch (error) {
-        console.error("OCR failed:", error);
-
-        res.status(500).json({
-        message: "OCR failed",
-        error: error.message
-        });
-    }
-});
 // Use routes
-app.use("/api/scan/:bookId", scanRoutes);
+app.use("/api/scan", scanRoutes);
 // app.use("/auth", authRoutes);          // register & login
 // app.use("/profile", profileRoutes);    // protected profile route
 // app.use("/upload", uploadRoutes);      // PDF upload

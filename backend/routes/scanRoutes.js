@@ -9,6 +9,6 @@ const upload = multer({
   storage: multer.memoryStorage()
 });
 
-router.post("/scan/:bookId", upload.single("image"), scan);
+router.post("/:bookId", upload.single("image"), scan);
 
 module.exports = router;
