@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 
-function Home(){
+function HomePage(){
 
   const videoRef = useRef(null)
   const streamRef = useRef(null)
