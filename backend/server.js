@@ -32,7 +32,8 @@ app.get("/api/test", (req, res) => {
   });
 });
 
-app.post("/api/scan", upload.single("image"), async (req, res) => {             // API SCAN // API SCAN // API SCAN // API SCAN //
+app.post("/api/scan/:bookId", upload.single("image"), async (req, res) => {             // API SCAN // API SCAN // API SCAN // API SCAN //
+  const bookId = req.params.bookId;
   console.log("SCAN REQUEST RECEIVED");
 
   if (!req.file) {
@@ -77,6 +78,7 @@ app.post("/api/scan", upload.single("image"), async (req, res) => {             
     }
 });
 // Use routes
+app.use("/api/scan/:bookId", scanRoutes);
 // app.use("/auth", authRoutes);          // register & login
 // app.use("/profile", profileRoutes);    // protected profile route
 // app.use("/upload", uploadRoutes);      // PDF upload

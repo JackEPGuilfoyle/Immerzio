@@ -66,10 +66,9 @@ function ScanPage(){
 
       const formData = new FormData()
       formData.append('image', blob, 'page.jpg')
-      formData.append('bookId', bookId)
 
       try {
-        const response = await fetch('https://immerzio-backend--immerzio-2.europe-west4.hosted.app/api/scan', {
+        const response = await fetch(`https://immerzio-backend--immerzio-2.europe-west4.hosted.app/scan/${bookId}`, {
           method: 'POST',
           body: formData,
         })
