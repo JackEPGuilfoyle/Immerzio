@@ -1,121 +1,63 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from "react";
+import { collection, getDocs } from "firebase/firestore";
+import { onAuthStateChanged } from "firebase/auth";
+import { auth, db } from "./firebase";
 
-function HomePage(){
-
-  const videoRef = useRef(null)
-  const streamRef = useRef(null)
-  const canvasRef = useRef(null)
-
-  const [cameraOpen, setCameraOpen] = useState(false)
-  const [message, setMessage] = useState('')
-
-  const testBackend = async () => {
-    try {
-      const response = await fetch(
-        'https://immerzio-backend--immerzio-2.europe-west4.hosted.app/api/test'
-      )
-
-      const data = await response.json()
-
-      setMessage(data.message)
-    } catch (error) {
-      console.error('Backend request failed:', error)
-      setMessage('Backend request failed')
-    }
-  }
-
+function Home() {
+  const [books, setBooks] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (cameraOpen && videoRef.current && streamRef.current) {
-      videoRef.current.srcObject = streamRef.current
-      videoRef.current.play()
-    }
-  }, [cameraOpen])
-
-  const openCamera = async () => {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: {
-          facingMode: 'environment',
-        },
-      })
-
-      streamRef.current = stream
-      setCameraOpen(true)
-    } catch (error) {
-      console.error('Could not access camera:', error)
-    }
-  }
-
-  const scanPage = () => {
-    const video = videoRef.current
-    const canvas = canvasRef.current
-
-    if (!video || !canvas) return
-
-    canvas.width = video.videoWidth
-    canvas.height = video.videoHeight
-
-    const context = canvas.getContext('2d')
-    context.drawImage(video, 0, 0, canvas.width, canvas.height)
-
-    canvas.toBlob(async (blob) => {
-      if (!blob) return
-
-      const formData = new FormData()
-      formData.append('image', blob, 'page.jpg')
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (!user) {
+        setBooks([]);
+        setLoading(false);
+        return;
+      }
 
       try {
-        const response = await fetch('https://immerzio-backend--immerzio-2.europe-west4.hosted.app/api/scan', {
-          method: 'POST',
-          body: formData,
-        })
+        const booksRef = collection(db, "users", user.uid, "books");
+        const snapshot = await getDocs(booksRef);
 
-        const data = await response.json()
+        const booksData = snapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
 
-        console.log('Backend response:', data)
+        setBooks(booksData);
       } catch (error) {
-        console.error('Could not send image:', error)
+        console.error("Could not load books:", error);
       }
-    }, 'image/jpeg')
+
+      setLoading(false);
+    });
+
+    return unsubscribe;
+  }, []);
+
+  if (loading) {
+    return <p>Loading books...</p>;
   }
-    return(
-     <div className="app">
-        <h1>Immerzio</h1>
 
-        <button className="camera-button" onClick={testBackend}>
-            Test Backend
-        </button>
+  return (
+    <div className="home">
+      <h1>Immerzio</h1>
 
-        <p>{message}</p>
+      <h2>Your Books</h2>
 
-        {!cameraOpen && (
-            <button className="camera-button" onClick={openCamera}>
-            Open Camera
-            </button>
-        )}
-
-        {cameraOpen && (
-            <>
-            <video
-                ref={videoRef}
-                autoPlay
-                playsInline
-                muted
-            />
-
-            <button className="camera-button" onClick={scanPage}>
-                Scan Page
-            </button>
-
-            <canvas
-                ref={canvasRef}
-                style={{ display: 'none' }}
-            />
-            </>
-        )}
+      {books.length === 0 ? (
+        <p>You haven't added any books yet.</p>
+      ) : (
+        <div className="book-list">
+          {books.map((book) => (
+            <div className="book" key={book.id}>
+              <h3>{book.title}</h3>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
-    )
+  );
 }
 
-export default HomePage;
+export default Home;
