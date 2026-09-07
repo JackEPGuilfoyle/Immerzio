@@ -3,6 +3,7 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import Home from "./Home.jsx";
 import ScanPage from "./ScanPage.jsx";
 import Register from "./Register.jsx";
+import AddBook from './AddBook.jsx';
 
 function App() {
 
@@ -12,6 +13,7 @@ function App() {
       <Route path="/scan" element={<ScanPage />} />
       <Route path="/register" element={<Register />} />
       <Route path="/home" element={<Home />} />
+      <Route path="/addBook" element={<AddBook/>}/>
    </Routes>
   )
 }

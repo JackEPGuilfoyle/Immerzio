@@ -1,11 +1,14 @@
 import { useEffect, useState } from "react";
 import { collection, getDocs } from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
+import { useNavigate } from "react-router-dom";
 import { auth, db } from "./firebase";
 
 function Home() {
   const [books, setBooks] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
@@ -44,6 +47,10 @@ function Home() {
       <h1>Immerzio</h1>
 
       <h2>Your Books</h2>
+
+      <button onClick={() => navigate("/add-book")}>
+        Add Book
+      </button>
 
       {books.length === 0 ? (
         <p>You haven't added any books yet.</p>
