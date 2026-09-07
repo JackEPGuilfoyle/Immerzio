@@ -56,11 +56,15 @@ function Home() {
         <p>You haven't added any books yet.</p>
       ) : (
         <div className="book-list">
-          {books.map((book) => (
-            <div className="book" key={book.id}>
-              <h3>{book.title}</h3>
-            </div>
-          ))}
+            {books.map((book) => (
+                <div
+                className="book"
+                key={book.id}
+                onClick={() => navigate(`/book/${book.id}`)}
+                >
+                <h3>{book.title}</h3>
+                </div>
+            ))}
         </div>
       )}
     </div>
