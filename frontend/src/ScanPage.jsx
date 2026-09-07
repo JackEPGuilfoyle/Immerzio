@@ -1,7 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
+import { useParams } from "react-router-dom";
 
 function ScanPage(){
 
+  const { bookId } = useParams();
   const videoRef = useRef(null)
   const streamRef = useRef(null)
   const canvasRef = useRef(null)
@@ -64,6 +66,7 @@ function ScanPage(){
 
       const formData = new FormData()
       formData.append('image', blob, 'page.jpg')
+      formData.append('bookId', bookId)
 
       try {
         const response = await fetch('https://immerzio-backend--immerzio-2.europe-west4.hosted.app/api/scan', {
