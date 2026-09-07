@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
-import { Routes, Route } from "react-router-dom";
 
-function App() {
+function Home(){
+
   const videoRef = useRef(null)
   const streamRef = useRef(null)
   const canvasRef = useRef(null)
@@ -79,44 +79,43 @@ function App() {
       }
     }, 'image/jpeg')
   }
+    return(
+     <div className="app">
+        <h1>Immerzio</h1>
 
-  return (
-    <div className="app">
-      <h1>Immerzio</h1>
-
-       <button className="camera-button" onClick={testBackend}>
-        Test Backend
-      </button>
-
-      <p>{message}</p>
-
-      {!cameraOpen && (
-        <button className="camera-button" onClick={openCamera}>
-          Open Camera
+        <button className="camera-button" onClick={testBackend}>
+            Test Backend
         </button>
-      )}
 
-      {cameraOpen && (
-        <>
-          <video
-            ref={videoRef}
-            autoPlay
-            playsInline
-            muted
-          />
+        <p>{message}</p>
 
-          <button className="camera-button" onClick={scanPage}>
-            Scan Page
-          </button>
+        {!cameraOpen && (
+            <button className="camera-button" onClick={openCamera}>
+            Open Camera
+            </button>
+        )}
 
-          <canvas
-            ref={canvasRef}
-            style={{ display: 'none' }}
-          />
-        </>
-      )}
+        {cameraOpen && (
+            <>
+            <video
+                ref={videoRef}
+                autoPlay
+                playsInline
+                muted
+            />
+
+            <button className="camera-button" onClick={scanPage}>
+                Scan Page
+            </button>
+
+            <canvas
+                ref={canvasRef}
+                style={{ display: 'none' }}
+            />
+            </>
+        )}
     </div>
-  )
+    )
 }
 
-export default App
+export default HomePage;
