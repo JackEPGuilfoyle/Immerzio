@@ -10,6 +10,11 @@ function ScanPage(){
 
   const [cameraOpen, setCameraOpen] = useState(false)
   const [message, setMessage] = useState('')
+  const [scannedPages, setScannedPages] = useState([])
+
+  useEffect(() => {
+    console.log("Scanned pages:", scannedPages)
+  }, [scannedPages])
 
   const testBackend = async () => {
     try {
@@ -75,18 +80,44 @@ function ScanPage(){
 
         const data = await response.json()
 
-        console.log('Backend response:', data)
+       // console.log('Backend response:', data)
+        //console.log('more details:', data.text)     // HERE'S WHERE THE OCR OUTPUT LIVES // HERE'S WHERE THE OCR OUTPUT LIVES // HERE'S WHERE THE OCR OUTPUT LIVES
+        setScannedPages(prev => [...prev, data.text])
       } catch (error) {
         console.error('Could not send image:', error)
       }
     }, 'image/jpeg')
   }
+
+  const finishScanning = async () => {
+    try {
+      const response = await fetch(
+        `https://immerzio-backend--immerzio-2.europe-west4.hosted.app/api/process/${bookId}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            pages: scannedPages
+          })
+        }
+      );
+
+      const data = await response.json();
+
+      console.log("Processing result:", data);
+
+    } catch (error) {
+      console.error("Could not process scanned pages:", error);
+    }
+  };
     return(
      <div className="app">
         <h1>Immerzio</h1>
 
-        <button className="camera-button" onClick={testBackend}>
-            Test Backend
+        <button className="camera-button" onClick={scanPage}>
+            Scan Page
         </button>
 
         <p>{message}</p>
@@ -106,8 +137,8 @@ function ScanPage(){
                 muted
             />
 
-            <button className="camera-button" onClick={scanPage}>
-                Scan Page
+            <button className="camera-button" onClick={finishScanning}>
+                Finish Scanning
             </button>
 
             <canvas
