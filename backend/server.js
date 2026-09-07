@@ -16,6 +16,7 @@ const port = process.env.PORT || 8080;
 // Import middleware
 // const verifyToken = require("./middleware/verifyToken");
 const scanRoutes = require("./routes/scanRoutes");
+const processRoutes = require("./routes/processRoutes");
 
 const app = express();
 app.use(cors());
@@ -34,11 +35,7 @@ app.get("/api/test", (req, res) => {
 });
 // Use routes
 app.use("/api/scan", scanRoutes);
-// app.use("/auth", authRoutes);          // register & login
-// app.use("/profile", profileRoutes);    // protected profile route
-// app.use("/upload", uploadRoutes);      // PDF upload
-// app.use("/books", booksRoutes);        // books & words routes
-// app.use("/knownWords", knownWordsRoutes); // known words routes
+app.use("/api/process",processRoutes)
 
 app.listen(port, () => console.log(`Backend running on port ${port}`));
 console.log("Backend is running...");
