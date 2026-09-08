@@ -48,7 +48,7 @@ function filterText(text) {
     .filter(word => word.length >= 2);
 
   const filtered = words.filter(word => {
-    return !germanStopwords.has(word);
+    return !germanStopwords.has((word.toLowerCase()));
   });
 
   return [...new Set(filtered)];

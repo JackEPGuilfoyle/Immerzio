@@ -7,6 +7,8 @@ const processWords = async (req, res) => {
 
   const text = pages.join("\n");
 
+  const dehyphenatedText = text.replace(/-\s*\n\s*/g, "");
+
   console.log("Processing book:", bookId);
 
   const uniqueWords = filterText(text);
