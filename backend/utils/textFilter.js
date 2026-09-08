@@ -38,10 +38,17 @@ function filterText(text) {
   const words = text
     .split(/\s+/)
     .map(word => word.replace(/[.,!?;:"()[\]{}]/g, ""))
-    .filter(Boolean);
+    .map(word => word.trim())
+    .filter(Boolean)
+
+    // Must contain a letter
+    .filter(word => /[a-zA-ZäöüÄÖÜß]/.test(word))
+
+    // Ignore single-character OCR garbage
+    .filter(word => word.length >= 2);
 
   const filtered = words.filter(word => {
-    return !germanStopwords.has(word.toLowerCase());
+    return !germanStopwords.has(word);
   });
 
   return [...new Set(filtered)];
