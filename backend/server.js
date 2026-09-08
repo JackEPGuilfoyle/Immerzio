@@ -26,13 +26,6 @@ const upload = multer({
   storage: multer.memoryStorage()
 });
 
-app.get("/api/test", (req, res) => {
-  console.log("Frontend contacted the backend!");
-
-  res.json({
-    message: "Hello from the Immerzio backend!"
-  });
-});
 // Use routes
 app.use("/api/scan", scanRoutes);
 app.use("/api/process",processRoutes)

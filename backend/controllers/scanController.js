@@ -3,8 +3,8 @@ const { createWorker } = require("tesseract.js");
 const scan = async (req, res) => {
   const bookId = req.params.bookId;
 
-  console.log("SCAN REQUEST RECEIVED");
-  console.log("Book ID:", bookId);
+  //console.log("SCAN REQUEST RECEIVED");
+  //console.log("Book ID:", bookId);
 
   if (!req.file) {
     console.log("No image received!");
@@ -14,12 +14,12 @@ const scan = async (req, res) => {
     });
   }
 
-  console.log("Image received!");
-  console.log("MIME type:", req.file.mimetype);
-  console.log("Size:", req.file.size, "bytes");
+  //console.log("Image received!");
+  //console.log("MIME type:", req.file.mimetype);
+  //console.log("Size:", req.file.size, "bytes");
 
   try {
-    console.log("Starting OCR...");
+    //console.log("Starting OCR...");
 
     const worker = await createWorker("deu");
 
@@ -29,9 +29,9 @@ const scan = async (req, res) => {
 
     const text = result.data.text;
 
-    console.log("OCR complete!");
-    console.log("Extracted text:");
-    console.log(text);
+    //console.log("OCR complete!");
+    //console.log("Extracted text:");
+    //console.log(text);
 
     res.json({
       message: "OCR successful!",
