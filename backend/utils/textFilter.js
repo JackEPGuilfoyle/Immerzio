@@ -35,23 +35,24 @@ const germanStopwords = new Set([
 
 function filterText(text) {
 
+  // Join words split across lines
+  text = text.replace(/-\s*\n\s*/g, "");
+
   const words = text
-    .split(/\s+/)
-    .map(word => word.replace(/[.,!?;:"()[\]{}]/g, ""))
-    .map(word => word.trim())
-    .filter(Boolean)
-
-    // Must contain a letter
-    .filter(word => /[a-zA-ZäöüÄÖÜß]/.test(word))
-
-    // Ignore single-character OCR garbage
-    .filter(word => word.length >= 2);
+  .split(/\s+/)
+  .map(word => word.replace(/[.,!?;:"()[\]{}]/g, ""))
+  .map(word => word.trim())
+  .filter(Boolean)
+  // Must contain letters only
+  .filter(word => /^[a-zA-ZäöüÄÖÜß]+$/.test(word))
+  // Ignore words with 2 or fewer characters
+  .filter(word => word.length > 2);
 
   const filtered = words.filter(word => {
     return !germanStopwords.has((word.toLowerCase()));
   });
 
-  return [...new Set(filtered)];
+  return [...new Set(filtered)]; //Set only stores unique values so this'll remove duplicate words before translation ;)
 }
 
 module.exports = { filterText };

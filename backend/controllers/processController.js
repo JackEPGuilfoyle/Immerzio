@@ -7,11 +7,12 @@ const processWords = async (req, res) => {
 
   const text = pages.join("\n");
 
-  const dehyphenatedText = text.replace(/-\s*\n\s*/g, "");
+  const dehyphenatedText = text.replace(/-\s*[|]?\s*\n\s*/g, "");
+  console.log(JSON.stringify(dehyphenatedText));
 
   console.log("Processing book:", bookId);
 
-  const uniqueWords = filterText(text);
+  const uniqueWords = filterText(dehyphenatedText);
 
   console.log("Number of words:", uniqueWords.length);
   console.log("Words:", uniqueWords);
