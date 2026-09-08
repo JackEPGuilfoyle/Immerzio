@@ -129,45 +129,80 @@ function ScanPage(){
     } catch (error) {
       console.error("Could not process scanned pages:", error);
     }
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    const testKnownWord = async () => {
-  try {
-    const user = auth.currentUser;
-
-    if (!user) {
-      console.error("No user signed in");
-      return;
-    }
-
-    const token = await user.getIdToken();
-
-    const response = await fetch(
-      "https://immerzio-backend--immerzio-2.europe-west4.hosted.app/api/knownWords",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`
-        },
-        body: JSON.stringify({
-          word: {
-            original: "Haus",
-            translated: "house"
-          }
-        })
-      }
-    );
-
-    const data = await response.json();
-
-    console.log("Known word result:", data);
-
-  } catch (error) {
-    console.error("Known word request failed:", error);
-  }
-};
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   };
+  ///////////////////////////////////////////////////////////////////////////////////////////////////
+  const testKnownWord = async () => {
+try {
+  const user = auth.currentUser;
+
+  if (!user) {
+    console.error("No user signed in");
+    return;
+  }
+
+  const token = await user.getIdToken();
+
+  const response = await fetch(
+    "https://immerzio-backend--immerzio-2.europe-west4.hosted.app/api/knownWords",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
+      },
+      body: JSON.stringify({
+        word: {
+          original: "möglich",
+          translated: "possible"
+        }
+      })
+    }
+  );
+
+  const data = await response.json();
+
+  console.log("Known word result:", data);
+
+} catch (error) {
+  console.error("Known word request failed:", error);
+}
+  };
+
+  const testStudySet = async () => {
+    try {
+      const user = auth.currentUser;
+
+      if (!user) {
+        console.error("No user signed in");
+        return;
+      }
+
+      const token = await user.getIdToken();
+
+      const response = await fetch(
+        `https://immerzio-backend--immerzio-2.europe-west4.hosted.app/api/study/${bookId}`,
+        {
+          headers: {
+            "Authorization": `Bearer ${token}`
+          }
+        }
+      );
+
+      const data = await response.json();
+
+      console.log("Study set:", data);
+      console.log(
+        "Haus in study set:",
+        data.words.some(
+          word => word.original.toLowerCase() === "möglich"
+        )
+      );
+
+    } catch (error) {
+      console.error("Study set request failed:", error);
+    }
+  };
+  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     return(
      <div className="app">
         <h1>Immerzio</h1>
@@ -175,7 +210,11 @@ function ScanPage(){
         <button onClick={testKnownWord}>
           Test Known Word
         </button>
-        
+
+        <button onClick={testStudySet}>
+          Test Study Set
+        </button>
+
         <button className="camera-button" onClick={scanPage}>
             Scan Page
         </button>
