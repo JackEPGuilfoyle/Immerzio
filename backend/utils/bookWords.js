@@ -27,7 +27,34 @@ async function saveBookWords(uid, bookId, words) {
   );
 }
 
+async function getKnownWords(uid) {
+  const file = bucket.file(`users/${uid}/knownWords.json`);
+
+  const [exists] = await file.exists();
+
+  if (!exists) {
+    return [];
+  }
+
+  const [contents] = await file.download();
+
+  return JSON.parse(contents.toString());
+}
+
+async function saveKnownWords(uid, words) {
+  const file = bucket.file(`users/${uid}/knownWords.json`);
+
+  await file.save(
+    JSON.stringify(words, null, 2),
+    {
+      contentType: "application/json"
+    }
+  );
+}
+
 module.exports = {
   getBookWords,
-  saveBookWords
+  saveBookWords,
+  getKnownWords,
+  saveKnownWords
 };
