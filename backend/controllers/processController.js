@@ -1,4 +1,5 @@
 const { filterText } = require("../utils/textFilter");
+const { translate } = require("../utils/translator");
 
 const processWords = async (req, res) => {
 
@@ -16,6 +17,10 @@ const processWords = async (req, res) => {
 
   console.log("Number of words:", uniqueWords.length);
   console.log("Words:", uniqueWords);
+  const translatedWords = await translate(uniqueWords);
+
+  console.log("Translated words:");
+  console.log(translatedWords);
 
   res.json({
     message: "Processing complete!",

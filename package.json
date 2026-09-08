@@ -2,6 +2,7 @@
   "name": "immerzio-backend",
   "version": "1.0.0",
   "dependencies": {
+    "@google-cloud/translate": "^10.0.1",
     "cors": "^2.8.6",
     "express": "^4.19.2",
     "firebase-admin": "^12.1.0",

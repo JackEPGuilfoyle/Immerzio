@@ -1,6 +1,3 @@
-require('dotenv').config();
-process.env.GOOGLE_APPLICATION_CREDENTIALS = process.env.GOOGLE_APPLICATION_CREDENTIALS;
-
 // Imports the Google Cloud client library
 const {Translate} = require('@google-cloud/translate').v2;
 
@@ -8,8 +5,6 @@ const {Translate} = require('@google-cloud/translate').v2;
 const translateClient = new Translate();
 
 async function translate(uniqueWords){ // Takes in the filtered set of words and returns a set of {"original" : "translated"} pairs
-    const text = uniqueWords;
-    const target = 'ru';
 
     const chunkSize = 128;
     const translationResults = [];
