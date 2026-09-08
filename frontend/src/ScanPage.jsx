@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useParams } from "react-router-dom";
+import { auth } from "./firebase";
 
 function ScanPage(){
 
@@ -91,16 +92,33 @@ function ScanPage(){
 
   const finishScanning = async () => {
     try {
-      const response = await fetch(
-        `https://immerzio-backend--immerzio-2.europe-west4.hosted.app/api/process/${bookId}`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            pages: scannedPages
-          })
+      const user = auth.currentUser;
+
+      console.log("Current user:", user);
+
+    if (!user) {
+      console.error("No user is signed in");
+      return;
+    }
+
+    const token = await user.getIdToken();
+
+    console.log("UID:", user.uid);
+    console.log("Token obtained:", !!token);
+
+    const response = await fetch(
+      `https://immerzio-backend--immerzio-2.europe-west4.hosted.app/api/process/${bookId}`,
+      {
+        method: "POST",
+
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
+
+        body: JSON.stringify({
+          pages: scannedPages
+        })
         }
       );
 
