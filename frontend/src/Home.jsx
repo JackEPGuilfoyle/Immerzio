@@ -62,7 +62,7 @@ function Home() {
         {
           method: "DELETE",
           headers: {
-            "Authorization": `Bearer ${token}`
+            Authorization: `Bearer ${token}`
           }
         }
       );
@@ -70,10 +70,6 @@ function Home() {
       if (!response.ok) {
         throw new Error("Failed to delete book");
       }
-
-      const data = await response.json();
-
-      console.log("Delete result:", data);
 
       setBooks(prevBooks =>
         prevBooks.filter(book => book.id !== bookId)
@@ -85,43 +81,68 @@ function Home() {
   };
 
   if (loading) {
-    return <p>Loading books...</p>;
+    return (
+      <div className="app-shell page-center">
+        <p className="page-subtitle">Loading your books...</p>
+      </div>
+    );
   }
 
   return (
-    <div className="home">
-      <h1>Immerzio</h1>
+    <div className="app-shell">
+      <div className="home">
 
-      <h2>Your Books</h2>
-
-      <button onClick={() => navigate("/add-book")}>
-        Add Book
-      </button>
-
-      {books.length === 0 ? (
-        <p>You haven't added any books yet.</p>
-      ) : (
-        <div className="book-list">
-            {books.map((book) => (
-                <div
-                  className="book"
-                  key={book.id}
-                  onClick={() => navigate(`/book/${book.id}`)}
-                >
-                  <h3>{book.title}</h3>
-
-                  <button
-                    onClick={(event) => {
-                      event.stopPropagation();
-                      deleteBook(book.id);
-                    }}
-                  >
-                    Delete
-                  </button>
-                </div>
-            ))}
+        <div className="home-header">
+          <h1 className="logo">Immerzio</h1>
+          <p className="page-subtitle">
+            Your language library
+          </p>
         </div>
-      )}
+
+        <div className="section-header">
+          <h2>Your Books</h2>
+
+          <button
+            className="primary-button add-book-button"
+            onClick={() => navigate("/add-book")}
+          >
+            + Add Book
+          </button>
+        </div>
+
+        {books.length === 0 ? (
+          <div className="form-card">
+            <p className="page-subtitle">
+              You haven't added any books yet.
+            </p>
+          </div>
+        ) : (
+          <div className="book-list">
+
+            {books.map((book) => (
+              <div
+                className="book"
+                key={book.id}
+                onClick={() => navigate(`/book/${book.id}`)}
+              >
+                <h3>{book.title}</h3>
+
+                <button
+                  className="danger-button"
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    deleteBook(book.id);
+                  }}
+                >
+                  Delete
+                </button>
+              </div>
+            ))}
+
+          </div>
+        )}
+
+      </div>
     </div>
   );
 }
