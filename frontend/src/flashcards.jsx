@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "./firebase";
 
 const FlashcardsPage = () => {
@@ -9,18 +10,25 @@ const FlashcardsPage = () => {
   const [words, setWords] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [showTranslation, setShowTranslation] = useState(false);
+
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const loadStudySet = async () => {
-      try {
-        const user = auth.currentUser;
+    let cancelled = false;
 
-        if (!user) {
-          setError("You must be signed in.");
-          return;
-        }
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (cancelled) return;
+
+      if (!user) {
+        setError("You must be signed in.");
+        setLoading(false);
+        return;
+      }
+
+      try {
+        setLoading(true);
+        setError(null);
 
         const token = await user.getIdToken();
 
@@ -39,19 +47,42 @@ const FlashcardsPage = () => {
 
         const data = await response.json();
 
-        setWords(data.words);
+        if (!cancelled) {
+          setWords(data.words || []);
+        }
       } catch (error) {
-        console.error("Failed to load study set:", error);
-        setError("Failed to load study set.");
+        if (!cancelled) {
+          console.error("Failed to load study set:", error);
+          setError("Failed to load study set.");
+        }
       } finally {
-        setLoading(false);
+        if (!cancelled) {
+          setLoading(false);
+        }
       }
-    };
+    });
 
-    loadStudySet();
+    return () => {
+      cancelled = true;
+      unsubscribe();
+    };
   }, [bookId]);
 
   const currentWord = words[currentIndex];
+
+  const goBack = () => {
+    navigate(`/book/${bookId}`);
+  };
+
+  const goToNextWord = () => {
+    setShowTranslation(false);
+
+    if (currentIndex < words.length - 1) {
+      setCurrentIndex(currentIndex + 1);
+    } else {
+      setCurrentIndex(0);
+    }
+  };
 
   const markKnown = async () => {
     try {
@@ -59,6 +90,7 @@ const FlashcardsPage = () => {
 
       if (!user) {
         console.error("No user signed in");
+        setError("Your sign-in session has expired.");
         return;
       }
 
@@ -88,16 +120,6 @@ const FlashcardsPage = () => {
     }
   };
 
-  const goToNextWord = () => {
-    setShowTranslation(false);
-
-    if (currentIndex < words.length - 1) {
-      setCurrentIndex(currentIndex + 1);
-    } else {
-      setCurrentIndex(0);
-    }
-  };
-
   const markUnknown = () => {
     goToNextWord();
   };
@@ -105,7 +127,18 @@ const FlashcardsPage = () => {
   if (loading) {
     return (
       <div className="flashcards">
-        <p>Loading flashcards...</p>
+        <button
+          type="button"
+          className="back-button"
+          onClick={goBack}
+        >
+          ← Back
+        </button>
+
+        <div className="flashcards-header">
+          <h1>Flashcards</h1>
+          <p>Loading your words...</p>
+        </div>
       </div>
     );
   }
@@ -114,13 +147,17 @@ const FlashcardsPage = () => {
     return (
       <div className="flashcards">
         <button
+          type="button"
           className="back-button"
-          onClick={() => navigate(`/book/${bookId}`)}
+          onClick={goBack}
         >
           ← Back
         </button>
 
-        <p>{error}</p>
+        <div className="flashcards-header">
+          <h1>Flashcards</h1>
+          <p>{error}</p>
+        </div>
       </div>
     );
   }
@@ -129,16 +166,22 @@ const FlashcardsPage = () => {
     return (
       <div className="flashcards">
         <button
+          type="button"
           className="back-button"
-          onClick={() => navigate(`/book/${bookId}`)}
+          onClick={goBack}
         >
           ← Back
         </button>
 
-        <h1>Flashcards</h1>
+        <div className="flashcards-header">
+          <h1>Flashcards</h1>
+          <p>You have no words to study.</p>
+        </div>
 
         <div className="empty-state">
-          <p>You have no words to study.</p>
+          <p>
+            You've learned all the words from this book.
+          </p>
         </div>
       </div>
     );
@@ -147,21 +190,26 @@ const FlashcardsPage = () => {
   return (
     <div className="flashcards">
 
-      <button
-        className="back-button"
-        onClick={() => navigate(`/book/${bookId}`)}
-      >
-        ← Back
-      </button>
+      {/* Back navigation */}
+      <div className="flashcards-navigation">
+        <button
+          type="button"
+          className="back-button"
+          onClick={goBack}
+        >
+          ← Back
+        </button>
+      </div>
 
+      {/* Header */}
       <div className="flashcards-header">
         <h1>Flashcards</h1>
-
         <p>
           Learn the words you don't know yet.
         </p>
       </div>
 
+      {/* Progress */}
       <div className="progress-container">
         <div className="progress-info">
           <span>
@@ -179,16 +227,18 @@ const FlashcardsPage = () => {
         </div>
       </div>
 
+      {/* Flashcard */}
       <div
         className={`card-scene ${
           showTranslation ? "flipped" : ""
         }`}
-        onClick={() => setShowTranslation(!showTranslation)}
+        onClick={() => setShowTranslation((prev) => !prev)}
         role="button"
         tabIndex={0}
         onKeyDown={(event) => {
           if (event.key === "Enter" || event.key === " ") {
-            setShowTranslation(!showTranslation);
+            event.preventDefault();
+            setShowTranslation((prev) => !prev);
           }
         }}
       >
@@ -225,31 +275,32 @@ const FlashcardsPage = () => {
         </div>
       </div>
 
-      {showTranslation && (
-        <div className="actions">
+      {/* Actions */}
+      <div className="actions">
 
-          <button
-            className="secondary-button"
-            onClick={(event) => {
-              event.stopPropagation();
-              markUnknown();
-            }}
-          >
-            I don't know
-          </button>
+        <button
+          type="button"
+          className="secondary-button"
+          onClick={(event) => {
+            event.stopPropagation();
+            markUnknown();
+          }}
+        >
+          I don't know
+        </button>
 
-          <button
-            className="primary-button"
-            onClick={(event) => {
-              event.stopPropagation();
-              markKnown();
-            }}
-          >
-            I know this
-          </button>
+        <button
+          type="button"
+          className="primary-button"
+          onClick={(event) => {
+            event.stopPropagation();
+            markKnown();
+          }}
+        >
+          I know this
+        </button>
 
-        </div>
-      )}
+      </div>
 
     </div>
   );

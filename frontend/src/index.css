@@ -2,8 +2,14 @@
   box-sizing: border-box;
 }
 
+html,
 body {
   margin: 0;
+  padding: 0;
+  min-height: 100%;
+}
+
+body {
   font-family: Arial, sans-serif;
   background: #09090f;
   color: white;
@@ -22,24 +28,9 @@ button {
   min-height: 100vh;
 }
 
-.page-header {
-  text-align: center;
-  position: relative;
-}
-
-.page-header h1 {
-  margin: 0;
-  font-size: 40px;
-  font-weight: 800;
-}
-
-.page-header p {
-  margin: 14px 0 0;
-  color: #aaa6ba;
-  font-size: 18px;
-}
-
-/* General buttons */
+/* ========================================
+   GENERAL BUTTONS
+   ======================================== */
 
 .primary-button,
 .secondary-button {
@@ -70,7 +61,8 @@ button {
 }
 
 .primary-button:active,
-.secondary-button:active {
+.secondary-button:active,
+.back-button:active {
   transform: scale(0.98);
 }
 
@@ -80,24 +72,245 @@ button {
   cursor: default;
 }
 
-/* Back button */
+/* ========================================
+   BACK BUTTON
+   ======================================== */
 
 .back-button {
-  align-self: flex-start;
-  background: transparent;
-  border: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  width: auto;
+  padding: 10px 16px;
+
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+
+  background: rgba(255, 255, 255, 0.06);
   color: #aaa6ba;
-  font-size: 17px;
+
+  font-size: 16px;
+  font-weight: 600;
+
   cursor: pointer;
-  padding: 8px 0;
-  margin-bottom: 10px;
+  transition:
+    transform 0.15s ease,
+    background 0.15s ease,
+    color 0.15s ease;
 }
 
 .back-button:hover {
   color: white;
+  background: rgba(255, 255, 255, 0.1);
 }
 
-/* Scan page */
+/* ========================================
+   PAGE HEADER
+   ======================================== */
+
+.page-header {
+  width: 100%;
+  text-align: center;
+}
+
+.page-header h1 {
+  margin: 0;
+  font-size: 40px;
+  font-weight: 800;
+}
+
+.page-header p {
+  margin: 14px 0 0;
+  color: #aaa6ba;
+  font-size: 18px;
+  line-height: 1.4;
+}
+
+/* ========================================
+   HOME PAGE
+   ======================================== */
+
+.home {
+  width: 100%;
+  max-width: 520px;
+  min-height: 100vh;
+  margin: 0 auto;
+  padding: 40px 20px;
+
+  background:
+    radial-gradient(
+      circle at 50% 0%,
+      rgba(99, 102, 241, 0.2),
+      transparent 45%
+    );
+}
+
+.home h1 {
+  margin: 0 0 8px;
+  font-size: 42px;
+  font-weight: 800;
+}
+
+.home h2 {
+  margin: 0 0 24px;
+  color: #aaa6ba;
+  font-size: 20px;
+  font-weight: 500;
+}
+
+.book-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-top: 24px;
+}
+
+.book {
+  position: relative;
+  padding: 22px;
+
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 22px;
+
+  background: rgba(255, 255, 255, 0.05);
+
+  cursor: pointer;
+
+  transition:
+    transform 0.15s ease,
+    background 0.15s ease;
+}
+
+.book:hover {
+  background: rgba(255, 255, 255, 0.08);
+  transform: translateY(-2px);
+}
+
+.book h3 {
+  margin: 0;
+  padding-right: 70px;
+  font-size: 22px;
+}
+
+.book button {
+  position: absolute;
+  top: 50%;
+  right: 18px;
+  transform: translateY(-50%);
+
+  padding: 8px 12px;
+
+  border: none;
+  border-radius: 10px;
+
+  background: rgba(255, 255, 255, 0.08);
+  color: #aaa6ba;
+
+  cursor: pointer;
+}
+
+.book button:hover {
+  color: white;
+  background: rgba(255, 255, 255, 0.14);
+}
+
+/* ========================================
+   ADD BOOK
+   ======================================== */
+
+.add-book {
+  width: 100%;
+  max-width: 520px;
+  min-height: 100vh;
+  margin: 0 auto;
+  padding: 40px 20px;
+
+  background:
+    radial-gradient(
+      circle at 50% 0%,
+      rgba(99, 102, 241, 0.2),
+      transparent 45%
+    );
+}
+
+.add-book h1 {
+  margin: 0 0 30px;
+  font-size: 40px;
+}
+
+.add-book form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.add-book label {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  color: #aaa6ba;
+  font-size: 15px;
+}
+
+.add-book input {
+  width: 100%;
+  padding: 17px;
+
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+
+  outline: none;
+
+  background: rgba(255, 255, 255, 0.06);
+  color: white;
+
+  font-size: 18px;
+}
+
+.add-book input:focus {
+  border-color: #8b5cf6;
+}
+
+/* ========================================
+   BOOK PAGE
+   ======================================== */
+
+.book-page {
+  width: 100%;
+  max-width: 520px;
+  min-height: 100vh;
+  margin: 0 auto;
+  padding: 28px 20px 40px;
+
+  background:
+    radial-gradient(
+      circle at 50% 0%,
+      rgba(99, 102, 241, 0.2),
+      transparent 45%
+    );
+}
+
+.book-page-header {
+  margin: 30px 0;
+}
+
+.book-page-header h1 {
+  margin: 0;
+  font-size: 40px;
+  font-weight: 800;
+}
+
+.book-page-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* ========================================
+   SCAN PAGE
+   ======================================== */
 
 .scan-page {
   width: 100%;
@@ -105,6 +318,7 @@ button {
   min-height: 100vh;
   margin: 0 auto;
   padding: 28px 20px 40px;
+
   display: flex;
   flex-direction: column;
   gap: 24px;
@@ -118,62 +332,76 @@ button {
 }
 
 .scan-page > .back-button {
-  margin-bottom: -10px;
+  align-self: flex-start;
 }
 
 .scan-interface {
   width: 100%;
+
   display: flex;
   flex-direction: column;
   gap: 18px;
 }
 
 /*
- * Camera
- *
- * The important part is NOT giving the video a giant fixed height.
- * The camera stream controls its own aspect ratio.
- */
+   CAMERA
+
+   The video must NOT have a fixed height.
+   Safari uses the camera's native aspect ratio.
+*/
 
 .camera-container {
   width: 100%;
   overflow: hidden;
+
   border-radius: 28px;
   border: 1px solid rgba(255, 255, 255, 0.1);
+
   background: #000;
+
   line-height: 0;
 }
 
 .scan-video {
   display: block;
+
   width: 100%;
   height: auto;
   max-width: 100%;
+
   object-fit: contain;
+
   background: #000;
 }
 
 .scan-count {
   margin: 0;
+
   text-align: center;
+
   color: #aaa6ba;
   font-size: 18px;
 }
 
 .scan-message {
   margin: 0;
+
   text-align: center;
+
   color: #c7c2d4;
   font-size: 16px;
 }
 
-/* Flashcards */
+/* ========================================
+   FLASHCARDS
+   ======================================== */
 
 .flashcards {
   width: 100%;
   max-width: 520px;
   min-height: 100vh;
   margin: 0 auto;
+
   padding: 28px 20px 40px;
 
   display: flex;
@@ -189,26 +417,35 @@ button {
     );
 }
 
-.flashcards > .back-button {
-  align-self: flex-start;
+.flashcards-navigation {
+  width: 100%;
+
+  display: flex;
+  justify-content: flex-start;
 }
 
 .flashcards-header {
+  width: 100%;
   text-align: center;
 }
 
 .flashcards-header h1 {
   margin: 0;
   font-size: 38px;
+  font-weight: 800;
 }
 
 .flashcards-header p {
   margin: 10px 0 0;
+
   color: #aaa6ba;
   font-size: 16px;
+  line-height: 1.4;
 }
 
-/* Progress */
+/* ========================================
+   FLASHCARD PROGRESS
+   ======================================== */
 
 .progress-container {
   width: 100%;
@@ -217,7 +454,9 @@ button {
 .progress-info {
   display: flex;
   justify-content: flex-end;
+
   margin-bottom: 8px;
+
   color: #aaa6ba;
   font-size: 14px;
 }
@@ -225,39 +464,53 @@ button {
 .progress-bar {
   width: 100%;
   height: 7px;
+
   overflow: hidden;
+
   border-radius: 999px;
+
   background: rgba(255, 255, 255, 0.08);
 }
 
 .progress-fill {
   height: 100%;
+
   border-radius: 999px;
+
   background: linear-gradient(
     90deg,
     #8b5cf6,
     #6366f1
   );
+
   transition: width 0.25s ease;
 }
 
-/* 3D flashcard */
+/* ========================================
+   3D FLASHCARD
+   ======================================== */
 
 .card-scene {
   width: 100%;
+
   height: min(62vh, 430px);
   min-height: 320px;
+
   perspective: 1200px;
+
   cursor: pointer;
+
   outline: none;
 }
 
 .flashcard {
   position: relative;
+
   width: 100%;
   height: 100%;
 
   transform-style: preserve-3d;
+
   transition: transform 0.6s ease;
 }
 
@@ -267,6 +520,7 @@ button {
 
 .flashcard-face {
   position: absolute;
+
   inset: 0;
 
   display: flex;
@@ -300,53 +554,127 @@ button {
 
 .card-label {
   margin-bottom: 25px;
+
   color: #aaa6ba;
+
   font-size: 14px;
   font-weight: 700;
+
   text-transform: uppercase;
   letter-spacing: 2px;
 }
 
 .flashcard-face h2 {
   margin: 0;
+
   text-align: center;
+
   font-size: clamp(38px, 10vw, 64px);
   line-height: 1.1;
+
   overflow-wrap: anywhere;
 }
 
 .card-hint {
   position: absolute;
+
   bottom: 28px;
+
   margin: 0;
+
   color: #777384;
+
   font-size: 14px;
 }
 
+/* ========================================
+   FLASHCARD ACTIONS
+   ======================================== */
+
 .actions {
   width: 100%;
+
   display: flex;
   flex-direction: column;
   gap: 12px;
 }
 
-/* Empty state */
+/* ========================================
+   EMPTY STATES
+   ======================================== */
 
 .empty-state {
   width: 100%;
+
   padding: 40px 20px;
+
   text-align: center;
+
   border-radius: 24px;
   border: 1px solid rgba(255, 255, 255, 0.08);
+
   background: rgba(255, 255, 255, 0.04);
+
   color: #aaa6ba;
 }
 
-/* Mobile */
+.empty-state p {
+  margin: 0;
+}
+
+/* ========================================
+   REGISTER / LOGIN
+   ======================================== */
+
+.register {
+  width: 100%;
+  max-width: 520px;
+  min-height: 100vh;
+  margin: 0 auto;
+
+  padding: 40px 20px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  background:
+    radial-gradient(
+      circle at 50% 20%,
+      rgba(99, 102, 241, 0.25),
+      transparent 50%
+    );
+}
+
+.register h1 {
+  margin: 0 0 12px;
+
+  text-align: center;
+
+  font-size: 42px;
+}
+
+.register p {
+  margin: 0 0 35px;
+
+  text-align: center;
+
+  color: #aaa6ba;
+  font-size: 18px;
+}
+
+/* ========================================
+   MOBILE
+   ======================================== */
 
 @media (max-width: 600px) {
   .scan-page,
-  .flashcards {
+  .flashcards,
+  .home,
+  .add-book,
+  .book-page,
+  .register {
     padding-left: 18px;
     padding-right: 18px;
   }
@@ -360,7 +688,15 @@ button {
   }
 
   .card-scene {
-    min-height: 300px;
     height: 58vh;
+    min-height: 300px;
+  }
+
+  .flashcard-face {
+    padding: 24px;
+  }
+
+  .flashcard-face h2 {
+    font-size: clamp(36px, 10vw, 56px);
   }
 }
