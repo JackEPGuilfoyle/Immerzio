@@ -1,155 +1,228 @@
-import { useEffect, useRef, useState } from 'react';
-import { useParams } from "react-router-dom";
+import { useEffect, useRef, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import { auth } from "./firebase";
 
-function ScanPage(){
-
+function ScanPage() {
   const { bookId } = useParams();
-  const videoRef = useRef(null)
-  const streamRef = useRef(null)
-  const canvasRef = useRef(null)
+  const navigate = useNavigate();
 
-  const [cameraOpen, setCameraOpen] = useState(false)
-  const [message, setMessage] = useState('')
-  const [scannedPages, setScannedPages] = useState([])
+  const videoRef = useRef(null);
+  const streamRef = useRef(null);
+  const canvasRef = useRef(null);
 
-  useEffect(() => {
-    console.log("Scanned pages:", scannedPages)
-  }, [scannedPages])
-
+  const [cameraOpen, setCameraOpen] = useState(false);
+  const [scannedPages, setScannedPages] = useState([]);
+  const [processing, setProcessing] = useState(false);
 
   useEffect(() => {
     if (cameraOpen && videoRef.current && streamRef.current) {
-      videoRef.current.srcObject = streamRef.current
-      videoRef.current.play()
+      videoRef.current.srcObject = streamRef.current;
+      videoRef.current.play();
     }
-  }, [cameraOpen])
+  }, [cameraOpen]);
+
+  useEffect(() => {
+    return () => {
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach(track => track.stop());
+      }
+    };
+  }, []);
 
   const openCamera = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
         video: {
-          facingMode: 'environment',
+          facingMode: "environment",
         },
-      })
+      });
 
-      streamRef.current = stream
-      setCameraOpen(true)
+      streamRef.current = stream;
+      setCameraOpen(true);
     } catch (error) {
-      console.error('Could not access camera:', error)
+      console.error("Could not access camera:", error);
     }
-  }
+  };
 
   const scanPage = () => {
-    const video = videoRef.current
-    const canvas = canvasRef.current
+    const video = videoRef.current;
+    const canvas = canvasRef.current;
 
-    if (!video || !canvas) return
+    if (!video || !canvas) return;
 
-    canvas.width = video.videoWidth
-    canvas.height = video.videoHeight
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
 
-    const context = canvas.getContext('2d')
-    context.drawImage(video, 0, 0, canvas.width, canvas.height)
+    const context = canvas.getContext("2d");
+
+    context.drawImage(
+      video,
+      0,
+      0,
+      canvas.width,
+      canvas.height
+    );
 
     canvas.toBlob(async (blob) => {
-      if (!blob) return
+      if (!blob) return;
 
-      const formData = new FormData()
-      formData.append('image', blob, 'page.jpg')
+      const formData = new FormData();
+      formData.append("image", blob, "page.jpg");
 
       try {
-        const response = await fetch(`https://immerzio-backend--immerzio-2.europe-west4.hosted.app/api/scan/${bookId}`, {
-          method: 'POST',
-          body: formData,
-        })
+        const response = await fetch(
+          `https://immerzio-backend--immerzio-2.europe-west4.hosted.app/api/scan/${bookId}`,
+          {
+            method: "POST",
+            body: formData,
+          }
+        );
 
-        const data = await response.json()
-        
-        //console.log('more details:', data.text)     // HERE'S WHERE THE OCR OUTPUT LIVES // HERE'S WHERE THE OCR OUTPUT LIVES // HERE'S WHERE THE OCR OUTPUT LIVES
-        setScannedPages(prev => [...prev, data.text])
+        if (!response.ok) {
+          throw new Error("Failed to scan page");
+        }
+
+        const data = await response.json();
+
+        setScannedPages(prev => [
+          ...prev,
+          data.text
+        ]);
+
       } catch (error) {
-        console.error('Could not send image:', error)
+        console.error("Could not send image:", error);
       }
-    }, 'image/jpeg')
-  }
+    }, "image/jpeg");
+  };
 
   const finishScanning = async () => {
     try {
+      setProcessing(true);
+
       const user = auth.currentUser;
 
-      console.log("Current user:", user);
+      if (!user) {
+        console.error("No user is signed in");
+        setProcessing(false);
+        return;
+      }
 
-    if (!user) {
-      console.error("No user is signed in");
-      return;
-    }
+      const token = await user.getIdToken();
 
-    const token = await user.getIdToken();
-
-    console.log("UID:", user.uid);
-    console.log("Token obtained:", !!token);
-
-    const response = await fetch(
-      `https://immerzio-backend--immerzio-2.europe-west4.hosted.app/api/process/${bookId}`,
-      {
-        method: "POST",
-
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`
-        },
-
-        body: JSON.stringify({
-          pages: scannedPages
-        })
+      const response = await fetch(
+        `https://immerzio-backend--immerzio-2.europe-west4.hosted.app/api/process/${bookId}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`
+          },
+          body: JSON.stringify({
+            pages: scannedPages
+          })
         }
       );
+
+      if (!response.ok) {
+        throw new Error("Failed to process scanned pages");
+      }
 
       const data = await response.json();
 
       console.log("Processing result:", data);
 
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach(track => track.stop());
+      }
+
+      navigate(`/book/${bookId}`);
+
     } catch (error) {
-      console.error("Could not process scanned pages:", error);
+      console.error(
+        "Could not process scanned pages:",
+        error
+      );
+
+      setProcessing(false);
     }
   };
-    return(
-     <div className="app">
-        <h1>Immerzio</h1>
 
-        <p>{message}</p>
+  return (
+    <div className="app-shell">
+      <div className="page scan-page">
+
+        <button
+          className="back-button"
+          onClick={() => navigate(`/book/${bookId}`)}
+        >
+          ← Back to Book
+        </button>
+
+        <div className="scan-header">
+          <h1>Scan Pages</h1>
+          <p>
+            Capture the pages you want to learn from.
+          </p>
+        </div>
 
         {!cameraOpen && (
-            <button className="camera-button" onClick={openCamera}>
+          <button
+            className="primary-button"
+            onClick={openCamera}
+          >
             Open Camera
-            </button>
+          </button>
         )}
 
         {cameraOpen && (
-            <>
-            <button className="camera-button" onClick={finishScanning}>
-                Finish Scanning
-            </button>
-            <video
+          <>
+            <div className="camera-container">
+              <video
                 ref={videoRef}
                 autoPlay
                 playsInline
                 muted
-            />
+              />
+            </div>
 
-            <button className="camera-button" onClick={scanPage}>
+            <div className="scan-controls">
+
+              <button
+                className="primary-button"
+                onClick={scanPage}
+              >
                 Scan Page
-            </button>
-            <p>Pages scanned: {scannedPages.length}</p>
+              </button>
+
+              <p className="scan-count">
+                {scannedPages.length}{" "}
+                {scannedPages.length === 1
+                  ? "page"
+                  : "pages"} scanned
+              </p>
+
+              <button
+                className="secondary-button"
+                onClick={finishScanning}
+                disabled={processing}
+              >
+                {processing
+                  ? "Processing..."
+                  : "Finish Scanning"}
+              </button>
+
+            </div>
+
             <canvas
-                ref={canvasRef}
-                style={{ display: 'none' }}
+              ref={canvasRef}
+              style={{ display: "none" }}
             />
-            </>
+          </>
         )}
+
+      </div>
     </div>
-    )
+  );
 }
 
 export default ScanPage;
