@@ -1,4 +1,3 @@
-import React from "react";
 import { useNavigate } from "react-router-dom";
 import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { auth } from "./firebase";
@@ -19,12 +18,33 @@ function Register() {
   };
 
   return (
-    <div>
-      <h1>Create an Immerzio account</h1>
+    <div className="app-shell page-center">
 
-      <button onClick={handleGoogleSignIn}>
-        Continue with Google
-      </button>
+      <div className="register-page">
+
+        <div className="register-logo">
+          I
+        </div>
+
+        <h1>
+          Learn languages<br />
+          through books.
+        </h1>
+
+        <p>
+          Scan the books you're reading and turn their vocabulary
+          into personalised flashcards.
+        </p>
+
+        <button
+          className="primary-button"
+          onClick={handleGoogleSignIn}
+        >
+          Continue with Google
+        </button>
+
+      </div>
+
     </div>
   );
 }
