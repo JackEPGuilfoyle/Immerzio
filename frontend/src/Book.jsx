@@ -5,16 +5,41 @@ function Book() {
   const navigate = useNavigate();
 
   return (
-    <div>
-      <h1>Book</h1>
+    <div className="app-shell">
+      <div className="page book-page">
 
-      <button onClick={() => navigate(`/flashcards/${bookId}`)}>
-        Learn
-      </button>
+        <button
+          className="back-button"
+          onClick={() => navigate("/home")}
+        >
+          ← Your Books
+        </button>
 
-      <button onClick={() => navigate(`/book/${bookId}/scan`)}>
-        Scan
-      </button>
+        <div className="book-hero">
+          <div className="book-icon">
+            📖
+          </div>
+
+          <h1>Book</h1>
+        </div>
+
+        <div className="book-actions">
+          <button
+            className="primary-button"
+            onClick={() => navigate(`/flashcards/${bookId}`)}
+          >
+            Learn
+          </button>
+
+          <button
+            className="secondary-button"
+            onClick={() => navigate(`/book/${bookId}/scan`)}
+          >
+            Scan Pages
+          </button>
+        </div>
+
+      </div>
     </div>
   );
 }
