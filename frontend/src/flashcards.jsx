@@ -52,6 +52,16 @@ const FlashcardsPage = () => {
 
   const currentWord = words[currentIndex];
 
+  const goToNextWord = () => {
+    setShowTranslation(false);
+
+    if (currentIndex < words.length - 1) {
+      setCurrentIndex(currentIndex + 1);
+    } else {
+      setCurrentIndex(0);
+    }
+  };
+
   const markKnown = async () => {
     try {
       const user = auth.currentUser;
@@ -88,78 +98,133 @@ const FlashcardsPage = () => {
     }
   };
 
-  const goToNextWord = () => {
-    setShowTranslation(false);
-
-    if (currentIndex < words.length - 1) {
-      setCurrentIndex(currentIndex + 1);
-    } else {
-      setCurrentIndex(0);
-    }
-  };
-
   const markUnknown = () => {
     goToNextWord();
   };
 
+  const flipCard = () => {
+    setShowTranslation(prev => !prev);
+  };
+
   if (loading) {
-    return <p>Loading flashcards...</p>;
-  }
-
-  if (error) {
-    return <p>{error}</p>;
-  }
-
-  if (words.length === 0) {
     return (
-      <div className="flashcards">
-        <h1>Flashcards</h1>
-        <p>You have no words to study.</p>
+      <div className="app-shell page-center">
+        <p className="page-subtitle">Loading your words...</p>
       </div>
     );
   }
 
-  return (
-    <div className="flashcards">
-
-      <h1>Flashcards</h1>
-
-      <div className="card">
-
-        <h2>{currentWord.original}</h2>
-
-        {showTranslation && (
-          <div className="translation">
-            {currentWord.translated}
-          </div>
-        )}
-
-        {!showTranslation && (
-          <button onClick={() => setShowTranslation(true)}>
-            Reveal
-          </button>
-        )}
-
+  if (error) {
+    return (
+      <div className="app-shell page-center">
+        <p>{error}</p>
       </div>
+    );
+  }
 
-      {showTranslation && (
-        <div className="actions">
+  if (words.length === 0) {
+    return (
+      <div className="app-shell">
+        <div className="page no-words">
+          <h1 className="page-title">All caught up</h1>
+          <p className="page-subtitle">
+            You have no words left to study.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
-          <button onClick={markUnknown}>
+  const progress = ((currentIndex + 1) / words.length) * 100;
+
+  return (
+    <div className="app-shell">
+      <div className="flashcards-page">
+
+        <div className="flashcards-header">
+          <h1 className="flashcards-title">
+            Learn
+          </h1>
+
+          <span className="progress-text">
+            {currentIndex + 1} / {words.length}
+          </span>
+        </div>
+
+        <div className="progress-bar">
+          <div
+            className="progress-fill"
+            style={{ width: `${progress}%` }}
+          />
+        </div>
+
+        <div
+          className="card-scene"
+          onClick={flipCard}
+          role="button"
+          tabIndex={0}
+          onKeyDown={(event) => {
+            if (event.key === "Enter" || event.key === " ") {
+              flipCard();
+            }
+          }}
+        >
+          <div
+            className={`card-inner ${
+              showTranslation ? "flipped" : ""
+            }`}
+          >
+
+            <div className="card-face card-front">
+              <span className="card-label">
+                German
+              </span>
+
+              <h2 className="card-word">
+                {currentWord.original}
+              </h2>
+
+              <p className="card-hint">
+                Tap to reveal
+              </p>
+            </div>
+
+            <div className="card-face card-back">
+              <span className="card-label">
+                English
+              </span>
+
+              <h2 className="card-translation">
+                {currentWord.translated}
+              </h2>
+
+              <p className="card-hint">
+                Tap to flip back
+              </p>
+            </div>
+
+          </div>
+        </div>
+
+        <div className="flashcard-actions">
+
+          <button
+            className="flashcard-action unknown-button"
+            onClick={markUnknown}
+          >
             I don't know
           </button>
 
-          <button onClick={markKnown}>
+          <button
+            className="flashcard-action known-button"
+            onClick={markKnown}
+          >
             I know this
           </button>
 
         </div>
-      )}
 
-      <p>
-        {currentIndex + 1} / {words.length}
-      </p>
-
+      </div>
     </div>
   );
 };
