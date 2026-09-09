@@ -13,21 +13,21 @@ function ScanPage() {
   const [cameraOpen, setCameraOpen] = useState(false);
   const [scannedPages, setScannedPages] = useState([]);
   const [processing, setProcessing] = useState(false);
-
-  useEffect(() => {
-    if (cameraOpen && videoRef.current && streamRef.current) {
-      videoRef.current.srcObject = streamRef.current;
-      videoRef.current.play();
-    }
-  }, [cameraOpen]);
+  const [message, setMessage] = useState("");
 
   useEffect(() => {
     return () => {
       if (streamRef.current) {
-        streamRef.current.getTracks().forEach(track => track.stop());
+        streamRef.current.getTracks().forEach((track) => track.stop());
       }
     };
   }, []);
+
+  useEffect(() => {
+    if (cameraOpen && videoRef.current && streamRef.current) {
+      videoRef.current.srcObject = streamRef.current;
+    }
+  }, [cameraOpen]);
 
   const openCamera = async () => {
     try {
@@ -39,8 +39,10 @@ function ScanPage() {
 
       streamRef.current = stream;
       setCameraOpen(true);
+      setMessage("");
     } catch (error) {
       console.error("Could not access camera:", error);
+      setMessage("Could not access the camera.");
     }
   };
 
@@ -63,47 +65,56 @@ function ScanPage() {
       canvas.height
     );
 
-    canvas.toBlob(async (blob) => {
-      if (!blob) return;
+    canvas.toBlob(
+      async (blob) => {
+        if (!blob) return;
 
-      const formData = new FormData();
-      formData.append("image", blob, "page.jpg");
+        const formData = new FormData();
+        formData.append("image", blob, "page.jpg");
 
-      try {
-        const response = await fetch(
-          `https://immerzio-backend--immerzio-2.europe-west4.hosted.app/api/scan/${bookId}`,
-          {
-            method: "POST",
-            body: formData,
+        try {
+          setMessage("Scanning page...");
+
+          const response = await fetch(
+            `https://immerzio-backend--immerzio-2.europe-west4.hosted.app/api/scan/${bookId}`,
+            {
+              method: "POST",
+              body: formData,
+            }
+          );
+
+          if (!response.ok) {
+            throw new Error("Failed to scan page");
           }
-        );
 
-        if (!response.ok) {
-          throw new Error("Failed to scan page");
+          const data = await response.json();
+
+          setScannedPages((prev) => [...prev, data.text]);
+          setMessage("");
+        } catch (error) {
+          console.error("Could not send image:", error);
+          setMessage("Could not scan the page.");
         }
-
-        const data = await response.json();
-
-        setScannedPages(prev => [
-          ...prev,
-          data.text
-        ]);
-
-      } catch (error) {
-        console.error("Could not send image:", error);
-      }
-    }, "image/jpeg");
+      },
+      "image/jpeg"
+    );
   };
 
   const finishScanning = async () => {
+    if (scannedPages.length === 0) {
+      setMessage("Scan at least one page first.");
+      return;
+    }
+
     try {
       setProcessing(true);
+      setMessage("Processing your pages...");
 
       const user = auth.currentUser;
 
       if (!user) {
         console.error("No user is signed in");
-        setProcessing(false);
+        setMessage("You must be signed in.");
         return;
       }
 
@@ -115,11 +126,11 @@ function ScanPage() {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify({
-            pages: scannedPages
-          })
+            pages: scannedPages,
+          }),
         }
       );
 
@@ -132,95 +143,94 @@ function ScanPage() {
       console.log("Processing result:", data);
 
       if (streamRef.current) {
-        streamRef.current.getTracks().forEach(track => track.stop());
+        streamRef.current.getTracks().forEach((track) => track.stop());
+        streamRef.current = null;
       }
 
       navigate(`/book/${bookId}`);
-
     } catch (error) {
-      console.error(
-        "Could not process scanned pages:",
-        error
-      );
-
+      console.error("Could not process scanned pages:", error);
+      setMessage("Could not process the scanned pages.");
+    } finally {
       setProcessing(false);
     }
   };
 
   return (
-    <div className="app-shell">
-      <div className="page scan-page">
+    <div className="scan-page">
 
+      <div className="page-header">
         <button
           className="back-button"
           onClick={() => navigate(`/book/${bookId}`)}
         >
-          ← Back to Book
+          ← Back
         </button>
 
-        <div className="scan-header">
-          <h1>Scan Pages</h1>
-          <p>
-            Capture the pages you want to learn from.
-          </p>
-        </div>
+        <h1>Scan Pages</h1>
 
-        {!cameraOpen && (
+        <p>
+          Capture the pages you want to learn from.
+        </p>
+      </div>
+
+      {message && (
+        <p className="scan-message">
+          {message}
+        </p>
+      )}
+
+      {!cameraOpen && (
+        <button
+          className="primary-button"
+          onClick={openCamera}
+        >
+          Open Camera
+        </button>
+      )}
+
+      {cameraOpen && (
+        <div className="scan-interface">
+
+          <div className="camera-container">
+            <video
+              ref={videoRef}
+              className="scan-video"
+              autoPlay
+              playsInline
+              muted
+            />
+          </div>
+
           <button
             className="primary-button"
-            onClick={openCamera}
+            onClick={scanPage}
+            disabled={processing}
           >
-            Open Camera
+            Scan Page
           </button>
-        )}
 
-        {cameraOpen && (
-          <>
-            <div className="camera-container">
-              <video
-                ref={videoRef}
-                autoPlay
-                playsInline
-                muted
-              />
-            </div>
+          <p className="scan-count">
+            {scannedPages.length}{" "}
+            {scannedPages.length === 1 ? "page" : "pages"} scanned
+          </p>
 
-            <div className="scan-controls">
+          <button
+            className="secondary-button"
+            onClick={finishScanning}
+            disabled={processing}
+          >
+            {processing ? "Processing..." : "Finish Scanning"}
+          </button>
 
-              <button
-                className="primary-button"
-                onClick={scanPage}
-              >
-                Scan Page
-              </button>
+          <canvas
+            ref={canvasRef}
+            style={{ display: "none" }}
+          />
 
-              <p className="scan-count">
-                {scannedPages.length}{" "}
-                {scannedPages.length === 1
-                  ? "page"
-                  : "pages"} scanned
-              </p>
+        </div>
+      )}
 
-              <button
-                className="secondary-button"
-                onClick={finishScanning}
-                disabled={processing}
-              >
-                {processing
-                  ? "Processing..."
-                  : "Finish Scanning"}
-              </button>
-
-            </div>
-
-            <canvas
-              ref={canvasRef}
-              style={{ display: "none" }}
-            />
-          </>
-        )}
-
-      </div>
     </div>
   );
 }
