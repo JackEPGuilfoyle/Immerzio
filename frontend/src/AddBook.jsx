@@ -42,28 +42,67 @@ function AddBook() {
   };
 
   return (
-    <div>
-      <h1>Add Book</h1>
+    <div className="app-shell">
+      <div className="page">
 
-      <form onSubmit={handleAddBook}>
-        <label>
-          Book title:
-          <input
-            type="text"
-            value={title}
-            onChange={(event) => setTitle(event.target.value)}
-            placeholder="Enter book title"
-          />
-        </label>
-
-        <button type="submit" disabled={saving}>
-          {saving ? "Adding..." : "Add Book"}
+        <button
+          className="back-button"
+          onClick={() => navigate("/home")}
+        >
+          ← Your Books
         </button>
-      </form>
 
-      <button onClick={() => navigate("/home")}>
-        Cancel
-      </button>
+        <h1 className="page-title">
+          Add a book
+        </h1>
+
+        <p className="page-subtitle">
+          Give your new vocabulary collection a name.
+        </p>
+
+        <div className="form-card">
+
+          <form onSubmit={handleAddBook}>
+
+            <div className="form-group">
+              <label htmlFor="book-title">
+                Book title
+              </label>
+
+              <input
+                id="book-title"
+                type="text"
+                value={title}
+                onChange={(event) => setTitle(event.target.value)}
+                placeholder="e.g. Harry Potter"
+              />
+            </div>
+
+            <div className="form-actions">
+
+              <button
+                className="primary-button"
+                type="submit"
+                disabled={saving}
+              >
+                {saving ? "Adding..." : "Add Book"}
+              </button>
+
+              <button
+                className="secondary-button"
+                type="button"
+                onClick={() => navigate("/home")}
+              >
+                Cancel
+              </button>
+
+            </div>
+
+          </form>
+
+        </div>
+
+      </div>
     </div>
   );
 }
