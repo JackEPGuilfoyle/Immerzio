@@ -17,21 +17,6 @@ function ScanPage(){
     console.log("Scanned pages:", scannedPages)
   }, [scannedPages])
 
-  const testBackend = async () => {
-    try {
-      const response = await fetch(
-        'https://immerzio-backend--immerzio-2.europe-west4.hosted.app/api/test'
-      )
-
-      const data = await response.json()
-
-      setMessage(data.message)
-    } catch (error) {
-      console.error('Backend request failed:', error)
-      setMessage('Backend request failed')
-    }
-  }
-
 
   useEffect(() => {
     if (cameraOpen && videoRef.current && streamRef.current) {
@@ -80,8 +65,7 @@ function ScanPage(){
         })
 
         const data = await response.json()
-
-       // console.log('Backend response:', data)
+        
         //console.log('more details:', data.text)     // HERE'S WHERE THE OCR OUTPUT LIVES // HERE'S WHERE THE OCR OUTPUT LIVES // HERE'S WHERE THE OCR OUTPUT LIVES
         setScannedPages(prev => [...prev, data.text])
       } catch (error) {
@@ -134,10 +118,6 @@ function ScanPage(){
      <div className="app">
         <h1>Immerzio</h1>
 
-        <button className="camera-button" onClick={finishScanning}>
-            Finish Scanning
-        </button>
-
         <p>{message}</p>
 
         {!cameraOpen && (
@@ -148,6 +128,9 @@ function ScanPage(){
 
         {cameraOpen && (
             <>
+            <button className="camera-button" onClick={finishScanning}>
+                Finish Scanning
+            </button>
             <video
                 ref={videoRef}
                 autoPlay
@@ -158,7 +141,7 @@ function ScanPage(){
             <button className="camera-button" onClick={scanPage}>
                 Scan Page
             </button>
-
+            <p>Pages scanned: {scannedPages.length}</p>
             <canvas
                 ref={canvasRef}
                 style={{ display: 'none' }}
