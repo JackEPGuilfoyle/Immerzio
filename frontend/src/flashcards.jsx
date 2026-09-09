@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { auth } from "./firebase";
 
 const FlashcardsPage = () => {
   const { bookId } = useParams();
+  const navigate = useNavigate();
 
   const [words, setWords] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -27,8 +28,8 @@ const FlashcardsPage = () => {
           `https://immerzio-backend--immerzio-2.europe-west4.hosted.app/api/study/${bookId}`,
           {
             headers: {
-              Authorization: `Bearer ${token}`
-            }
+              Authorization: `Bearer ${token}`,
+            },
           }
         );
 
@@ -52,16 +53,6 @@ const FlashcardsPage = () => {
 
   const currentWord = words[currentIndex];
 
-  const goToNextWord = () => {
-    setShowTranslation(false);
-
-    if (currentIndex < words.length - 1) {
-      setCurrentIndex(currentIndex + 1);
-    } else {
-      setCurrentIndex(0);
-    }
-  };
-
   const markKnown = async () => {
     try {
       const user = auth.currentUser;
@@ -79,11 +70,11 @@ const FlashcardsPage = () => {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify({
-            word: currentWord
-          })
+            word: currentWord,
+          }),
         }
       );
 
@@ -92,9 +83,18 @@ const FlashcardsPage = () => {
       }
 
       goToNextWord();
-
     } catch (error) {
       console.error("Failed to mark word as known:", error);
+    }
+  };
+
+  const goToNextWord = () => {
+    setShowTranslation(false);
+
+    if (currentIndex < words.length - 1) {
+      setCurrentIndex(currentIndex + 1);
+    } else {
+      setCurrentIndex(0);
     }
   };
 
@@ -102,21 +102,24 @@ const FlashcardsPage = () => {
     goToNextWord();
   };
 
-  const flipCard = () => {
-    setShowTranslation(prev => !prev);
-  };
-
   if (loading) {
     return (
-      <div className="app-shell page-center">
-        <p className="page-subtitle">Loading your words...</p>
+      <div className="flashcards">
+        <p>Loading flashcards...</p>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="app-shell page-center">
+      <div className="flashcards">
+        <button
+          className="back-button"
+          onClick={() => navigate(`/book/${bookId}`)}
+        >
+          ← Back
+        </button>
+
         <p>{error}</p>
       </div>
     );
@@ -124,29 +127,44 @@ const FlashcardsPage = () => {
 
   if (words.length === 0) {
     return (
-      <div className="app-shell">
-        <div className="page no-words">
-          <h1 className="page-title">All caught up</h1>
-          <p className="page-subtitle">
-            You have no words left to study.
-          </p>
+      <div className="flashcards">
+        <button
+          className="back-button"
+          onClick={() => navigate(`/book/${bookId}`)}
+        >
+          ← Back
+        </button>
+
+        <h1>Flashcards</h1>
+
+        <div className="empty-state">
+          <p>You have no words to study.</p>
         </div>
       </div>
     );
   }
 
-  const progress = ((currentIndex + 1) / words.length) * 100;
-
   return (
-    <div className="app-shell">
-      <div className="flashcards-page">
+    <div className="flashcards">
 
-        <div className="flashcards-header">
-          <h1 className="flashcards-title">
-            Learn
-          </h1>
+      <button
+        className="back-button"
+        onClick={() => navigate(`/book/${bookId}`)}
+      >
+        ← Back
+      </button>
 
-          <span className="progress-text">
+      <div className="flashcards-header">
+        <h1>Flashcards</h1>
+
+        <p>
+          Learn the words you don't know yet.
+        </p>
+      </div>
+
+      <div className="progress-container">
+        <div className="progress-info">
+          <span>
             {currentIndex + 1} / {words.length}
           </span>
         </div>
@@ -154,77 +172,85 @@ const FlashcardsPage = () => {
         <div className="progress-bar">
           <div
             className="progress-fill"
-            style={{ width: `${progress}%` }}
+            style={{
+              width: `${((currentIndex + 1) / words.length) * 100}%`,
+            }}
           />
         </div>
+      </div>
 
-        <div
-          className="card-scene"
-          onClick={flipCard}
-          role="button"
-          tabIndex={0}
-          onKeyDown={(event) => {
-            if (event.key === "Enter" || event.key === " ") {
-              flipCard();
-            }
-          }}
-        >
-          <div
-            className={`card-inner ${
-              showTranslation ? "flipped" : ""
-            }`}
-          >
+      <div
+        className={`card-scene ${
+          showTranslation ? "flipped" : ""
+        }`}
+        onClick={() => setShowTranslation(!showTranslation)}
+        role="button"
+        tabIndex={0}
+        onKeyDown={(event) => {
+          if (event.key === "Enter" || event.key === " ") {
+            setShowTranslation(!showTranslation);
+          }
+        }}
+      >
+        <div className="flashcard">
 
-            <div className="card-face card-front">
-              <span className="card-label">
-                German
-              </span>
+          <div className="flashcard-face flashcard-front">
+            <span className="card-label">
+              German
+            </span>
 
-              <h2 className="card-word">
-                {currentWord.original}
-              </h2>
+            <h2>
+              {currentWord.original}
+            </h2>
 
-              <p className="card-hint">
-                Tap to reveal
-              </p>
-            </div>
-
-            <div className="card-face card-back">
-              <span className="card-label">
-                English
-              </span>
-
-              <h2 className="card-translation">
-                {currentWord.translated}
-              </h2>
-
-              <p className="card-hint">
-                Tap to flip back
-              </p>
-            </div>
-
+            <p className="card-hint">
+              Tap to reveal
+            </p>
           </div>
-        </div>
 
-        <div className="flashcard-actions">
+          <div className="flashcard-face flashcard-back">
+            <span className="card-label">
+              English
+            </span>
+
+            <h2>
+              {currentWord.translated}
+            </h2>
+
+            <p className="card-hint">
+              Tap to flip back
+            </p>
+          </div>
+
+        </div>
+      </div>
+
+      {showTranslation && (
+        <div className="actions">
 
           <button
-            className="flashcard-action unknown-button"
-            onClick={markUnknown}
+            className="secondary-button"
+            onClick={(event) => {
+              event.stopPropagation();
+              markUnknown();
+            }}
           >
             I don't know
           </button>
 
           <button
-            className="flashcard-action known-button"
-            onClick={markKnown}
+            className="primary-button"
+            onClick={(event) => {
+              event.stopPropagation();
+              markKnown();
+            }}
           >
             I know this
           </button>
 
         </div>
+      )}
 
-      </div>
     </div>
   );
 };
