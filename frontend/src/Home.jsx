@@ -51,12 +51,29 @@ function Home() {
       const user = auth.currentUser;
 
       if (!user) {
+        console.error("No user signed in");
         return;
       }
 
-      await deleteDoc(
-        doc(db, "users", user.uid, "books", bookId)
+      const token = await user.getIdToken();
+
+      const response = await fetch(
+        `https://immerzio-backend--immerzio-2.europe-west4.hosted.app/api/books/${bookId}`,
+        {
+          method: "DELETE",
+          headers: {
+            "Authorization": `Bearer ${token}`
+          }
+        }
       );
+
+      if (!response.ok) {
+        throw new Error("Failed to delete book");
+      }
+
+      const data = await response.json();
+
+      console.log("Delete result:", data);
 
       setBooks(prevBooks =>
         prevBooks.filter(book => book.id !== bookId)
