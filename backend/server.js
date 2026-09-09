@@ -19,6 +19,7 @@ const scanRoutes = require("./routes/scanRoutes");
 const processRoutes = require("./routes/processRoutes");
 const knownWordsRoutes = require("./routes/knownWordsRoutes");
 const studyRoutes = require("./routes/studyRoutes");
+const bookRoutes = require("./routes/bookRoutes");
 
 const app = express();
 app.use(cors());
@@ -33,6 +34,7 @@ app.use("/api/scan", scanRoutes);
 app.use("/api/process",processRoutes);
 app.use("/api/knownWords", knownWordsRoutes);
 app.use("/api/study", studyRoutes);
+app.use("/api/books", bookRoutes);
 
 app.listen(port, () => console.log(`Backend running on port ${port}`));
 console.log("Backend is running...");

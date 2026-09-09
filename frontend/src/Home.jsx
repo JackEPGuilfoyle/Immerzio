@@ -38,6 +38,35 @@ function Home() {
     return unsubscribe;
   }, []);
 
+  const deleteBook = async (bookId) => {
+    const confirmed = window.confirm(
+      "Are you sure you want to delete this book?"
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    try {
+      const user = auth.currentUser;
+
+      if (!user) {
+        return;
+      }
+
+      await deleteDoc(
+        doc(db, "users", user.uid, "books", bookId)
+      );
+
+      setBooks(prevBooks =>
+        prevBooks.filter(book => book.id !== bookId)
+      );
+
+    } catch (error) {
+      console.error("Could not delete book:", error);
+    }
+  };
+
   if (loading) {
     return <p>Loading books...</p>;
   }
@@ -58,11 +87,20 @@ function Home() {
         <div className="book-list">
             {books.map((book) => (
                 <div
-                className="book"
-                key={book.id}
-                onClick={() => navigate(`/book/${book.id}`)}
+                  className="book"
+                  key={book.id}
+                  onClick={() => navigate(`/book/${book.id}`)}
                 >
-                <h3>{book.title}</h3>
+                  <h3>{book.title}</h3>
+
+                  <button
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      deleteBook(book.id);
+                    }}
+                  >
+                    Delete
+                  </button>
                 </div>
             ))}
         </div>
