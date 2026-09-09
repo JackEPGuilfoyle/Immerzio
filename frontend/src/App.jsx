@@ -5,6 +5,7 @@ import ScanPage from "./ScanPage.jsx";
 import Register from "./Register.jsx";
 import AddBook from './AddBook.jsx';
 import Book from './Book.jsx';
+import FlashcardsPage from './flashcards.jsx';
 
 function App() {
 
@@ -16,6 +17,7 @@ function App() {
       <Route path="/home" element={<Home />} />
       <Route path="/add-book" element={<AddBook/>}/>
       <Route path="/book/:bookId" element={<Book/>}/>
+      <Route path="/flashcards/:bookId" element={<FlashcardsPage />}/>
    </Routes>
   )
 }

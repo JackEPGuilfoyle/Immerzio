@@ -8,7 +8,7 @@ function Book() {
     <div>
       <h1>Book</h1>
 
-      <button onClick={() => navigate(`/book/${bookId}/learn`)}>
+      <button onClick={() => navigate(`/flashcards/${bookId}`)}>
         Learn
       </button>
 

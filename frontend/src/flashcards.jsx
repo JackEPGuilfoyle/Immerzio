@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { auth } from "../firebase";
+import { auth } from "./firebase";
 
 const FlashcardsPage = () => {
   const { bookId } = useParams();
