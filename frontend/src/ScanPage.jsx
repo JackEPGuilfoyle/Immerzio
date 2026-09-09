@@ -134,8 +134,8 @@ function ScanPage(){
      <div className="app">
         <h1>Immerzio</h1>
 
-        <button className="camera-button" onClick={scanPage}>
-            Scan Page
+        <button className="camera-button" onClick={finishScanning}>
+            Finish Scanning
         </button>
 
         <p>{message}</p>
@@ -155,8 +155,8 @@ function ScanPage(){
                 muted
             />
 
-            <button className="camera-button" onClick={finishScanning}>
-                Finish Scanning
+            <button className="camera-button" onClick={scanPage}>
+                Scan Page
             </button>
 
             <canvas
